@@ -5,7 +5,7 @@ import PrivacyModal from '@/components/seto/privacy-modal'
 import MoodTracker from '@/components/seto/mood-tracker'
 import ChatInterface from '@/components/seto/chat-interface'
 import ElephantMascot from '@/components/seto/elephant-mascot'
-import { Shield, Users } from 'lucide-react'
+import { Shield, Users, Info } from 'lucide-react'
 
 type Phase = 'privacy' | 'pre-mood' | 'matching' | 'chat' | 'post-mood' | 'done'
 
@@ -113,6 +113,15 @@ export default function ChatPage() {
             >
               Terminer
             </button>
+          </div>
+
+          {/* Démo : honnêteté envers le visiteur */}
+          <div className="flex items-start gap-2 px-4 py-2 bg-[#E87040]/8 border-b border-[#E87040]/20">
+            <Info size={13} className="text-[#E87040] shrink-0 mt-0.5" />
+            <p className="text-[#FAC5A8] text-xs leading-relaxed">
+              <span className="font-medium">Démonstration</span> — les réponses sont automatiques pour vous montrer
+              l'expérience. Bientôt, Sɛto vous connectera à de vrais écoutants formés.
+            </p>
           </div>
 
           {/* Chat body */}

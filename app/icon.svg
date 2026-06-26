@@ -1,0 +1,29 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="44" fill="#0D1B2E"/>
+  <g transform="translate(0,4)">
+    <!-- Left ear -->
+    <ellipse cx="34" cy="92" rx="28" ry="34" fill="#E87040" opacity="0.9"/>
+    <ellipse cx="36" cy="92" rx="19" ry="23" fill="#F09060" opacity="0.6"/>
+    <!-- Right ear -->
+    <ellipse cx="166" cy="92" rx="28" ry="34" fill="#E87040" opacity="0.9"/>
+    <ellipse cx="164" cy="92" rx="19" ry="23" fill="#F09060" opacity="0.6"/>
+    <!-- Body -->
+    <ellipse cx="100" cy="140" rx="48" ry="42" fill="#1E3450"/>
+    <!-- Head -->
+    <circle cx="100" cy="86" r="46" fill="#1E3450"/>
+    <!-- Eyes -->
+    <circle cx="83" cy="82" r="9" fill="#F0EDE8"/>
+    <circle cx="117" cy="82" r="9" fill="#F0EDE8"/>
+    <circle cx="85" cy="83" r="5.5" fill="#0D1B2E"/>
+    <circle cx="119" cy="83" r="5.5" fill="#0D1B2E"/>
+    <circle cx="87" cy="81" r="2" fill="#F0EDE8"/>
+    <circle cx="121" cy="81" r="2" fill="#F0EDE8"/>
+    <!-- Trunk -->
+    <path d="M 92 106 Q 80 124 84 144 Q 86 154 96 152" stroke="#243B55" stroke-width="11" fill="none" stroke-linecap="round"/>
+    <!-- Smile -->
+    <path d="M 88 96 Q 100 105 112 96" stroke="#8BA3BC" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Cheeks -->
+    <ellipse cx="73" cy="93" rx="9" ry="5" fill="#E87040" opacity="0.3"/>
+    <ellipse cx="127" cy="93" rx="9" ry="5" fill="#E87040" opacity="0.3"/>
+  </g>
+</svg>

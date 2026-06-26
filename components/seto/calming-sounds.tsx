@@ -3,15 +3,22 @@
 import { useState, useRef, useCallback } from 'react'
 import { Play, Square, Volume2, VolumeX } from 'lucide-react'
 
+// Chaque son sait se lancer et s'arrêter proprement.
+interface SoundPlayer {
+  start: () => void
+  stop: () => void
+}
+
 interface Sound {
   id: string
   name: string
   emoji: string
   desc: string
-  generate: (ctx: AudioContext, gain: GainNode) => AudioNode
+  create: (ctx: AudioContext, gain: GainNode) => SoundPlayer
 }
 
-function createPinkNoise(ctx: AudioContext, gain: GainNode): AudioNode {
+// --- Pluie tropicale : bruit rose (doux, feutré) ---
+function pinkNoise(ctx: AudioContext, gain: GainNode): SoundPlayer {
   const bufferSize = 2 * ctx.sampleRate
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
   const data = buffer.getChannelData(0)
@@ -31,10 +38,14 @@ function createPinkNoise(ctx: AudioContext, gain: GainNode): AudioNode {
   source.buffer = buffer
   source.loop = true
   source.connect(gain)
-  return source
+  return {
+    start: () => source.start(),
+    stop: () => { try { source.stop() } catch {} },
+  }
 }
 
-function createBrownNoise(ctx: AudioContext, gain: GainNode): AudioNode {
+// --- Rivière : bruit brun (flux grave et continu) ---
+function brownNoise(ctx: AudioContext, gain: GainNode): SoundPlayer {
   const bufferSize = 2 * ctx.sampleRate
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
   const data = buffer.getChannelData(0)
@@ -48,24 +59,46 @@ function createBrownNoise(ctx: AudioContext, gain: GainNode): AudioNode {
   source.buffer = buffer
   source.loop = true
   source.connect(gain)
-  return source
+  return {
+    start: () => source.start(),
+    stop: () => { try { source.stop() } catch {} },
+  }
 }
 
-function createChimes(ctx: AudioContext, gain: GainNode): AudioNode {
-  // Create a simple oscillator-based chime effect
-  const osc = ctx.createOscillator()
-  const filter = ctx.createBiquadFilter()
-  filter.type = 'bandpass'
-  filter.frequency.value = 432
-  filter.Q.value = 0.8
-  osc.type = 'sine'
-  osc.frequency.value = 432
-  osc.connect(filter)
-  filter.connect(gain)
-  return osc
+// --- Carillons : de vraies cloches douces qui tintent par intermittence.
+//     Notes d'une gamme pentatonique → toujours harmonieux, jamais de fausse note. ---
+function chimes(ctx: AudioContext, gain: GainNode): SoundPlayer {
+  const notes = [523.25, 587.33, 659.25, 783.99, 880.0] // Do Ré Mi Sol La (octave 5)
+  let timer: ReturnType<typeof setTimeout> | null = null
+  let stopped = false
+
+  function ring() {
+    if (stopped) return
+    const now = ctx.currentTime
+    const osc = ctx.createOscillator()
+    const env = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.value = notes[Math.floor(Math.random() * notes.length)]
+    // Enveloppe « cloche » : attaque rapide puis longue extinction douce
+    env.gain.setValueAtTime(0.0001, now)
+    env.gain.exponentialRampToValueAtTime(0.7, now + 0.02)
+    env.gain.exponentialRampToValueAtTime(0.0001, now + 2.4)
+    osc.connect(env)
+    env.connect(gain)
+    osc.start(now)
+    osc.stop(now + 2.5)
+    // Prochaine cloche dans 1,2 à 3,4 s
+    timer = setTimeout(ring, 1200 + Math.random() * 2200)
+  }
+
+  return {
+    start: () => { stopped = false; ring() },
+    stop: () => { stopped = true; if (timer) clearTimeout(timer) },
+  }
 }
 
-function createBinauralBeats(ctx: AudioContext, gain: GainNode): AudioNode {
+// --- Ondes alpha : battements binauraux (10 Hz) pour la détente ---
+function binauralBeats(ctx: AudioContext, gain: GainNode): SoundPlayer {
   const oscL = ctx.createOscillator()
   const oscR = ctx.createOscillator()
   const merger = ctx.createChannelMerger(2)
@@ -74,7 +107,7 @@ function createBinauralBeats(ctx: AudioContext, gain: GainNode): AudioNode {
   gainL.gain.value = 0.3
   gainR.gain.value = 0.3
   oscL.frequency.value = 200
-  oscR.frequency.value = 210 // 10 Hz alpha wave difference
+  oscR.frequency.value = 210 // 10 Hz d'écart → onde alpha
   oscL.type = 'sine'
   oscR.type = 'sine'
   oscL.connect(gainL)
@@ -82,30 +115,30 @@ function createBinauralBeats(ctx: AudioContext, gain: GainNode): AudioNode {
   gainL.connect(merger, 0, 0)
   gainR.connect(merger, 0, 1)
   merger.connect(gain)
-  return oscL
+  return {
+    start: () => { oscL.start(); oscR.start() },
+    stop: () => { try { oscL.stop(); oscR.stop() } catch {} },
+  }
 }
 
 const sounds: Sound[] = [
-  { id: 'rain', name: 'Pluie tropicale', emoji: '🌧️', desc: 'Bruit rose apaisant', generate: createPinkNoise },
-  { id: 'river', name: 'Rivière', emoji: '🌊', desc: 'Bruit brun, flux naturel', generate: createBrownNoise },
-  { id: 'chimes', name: 'Carillons', emoji: '🎐', desc: 'Tones doux à 432 Hz', generate: createChimes },
-  { id: 'binaural', name: 'Ondes alpha', emoji: '🧠', desc: 'Battements binauraux 10 Hz', generate: createBinauralBeats },
+  { id: 'rain', name: 'Pluie tropicale', emoji: '🌧️', desc: 'Bruit rose apaisant', create: pinkNoise },
+  { id: 'river', name: 'Rivière', emoji: '🌊', desc: 'Flux naturel et grave', create: brownNoise },
+  { id: 'chimes', name: 'Carillons', emoji: '🎐', desc: 'Douces cloches en gamme apaisante', create: chimes },
+  { id: 'binaural', name: 'Ondes alpha', emoji: '🧠', desc: 'Battements binauraux 10 Hz (au casque)', create: binauralBeats },
 ]
 
 export default function CalmingSounds() {
   const [playing, setPlaying] = useState<string | null>(null)
   const [volume, setVolume] = useState(0.4)
   const ctxRef = useRef<AudioContext | null>(null)
-  const sourceRef = useRef<AudioNode | null>(null)
+  const playerRef = useRef<SoundPlayer | null>(null)
   const gainRef = useRef<GainNode | null>(null)
 
   const stop = useCallback(() => {
-    if (sourceRef.current) {
-      try {
-        (sourceRef.current as AudioBufferSourceNode).stop?.()
-        ;(sourceRef.current as OscillatorNode).stop?.()
-      } catch {}
-      sourceRef.current = null
+    if (playerRef.current) {
+      playerRef.current.stop()
+      playerRef.current = null
     }
     setPlaying(null)
   }, [])
@@ -116,15 +149,17 @@ export default function CalmingSounds() {
       ctxRef.current = new AudioContext()
     }
     const ctx = ctxRef.current
+    // Les navigateurs démarrent l'audio en pause : on le réveille au clic.
+    if (ctx.state === 'suspended') ctx.resume()
+
     const gain = ctx.createGain()
     gain.gain.value = volume
     gain.connect(ctx.destination)
     gainRef.current = gain
 
-    const source = sound.generate(ctx, gain)
-    ;(source as AudioBufferSourceNode).start?.()
-    ;(source as OscillatorNode).start?.()
-    sourceRef.current = source
+    const player = sound.create(ctx, gain)
+    player.start()
+    playerRef.current = player
     setPlaying(sound.id)
   }, [stop, volume])
 
@@ -180,6 +215,7 @@ export default function CalmingSounds() {
           value={volume}
           onChange={e => handleVolume(Number(e.target.value))}
           className="flex-1 accent-[#E87040] h-1"
+          aria-label="Volume"
         />
         <span className="text-[#5C7A9A] text-xs w-8">{Math.round(volume * 100)}%</span>
       </div>

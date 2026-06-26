@@ -7,23 +7,27 @@ interface CrisisOverlayProps {
   onClose: () => void
 }
 
+// Numéros d'urgence officiels du Togo (Police 117, Pompiers 118, SAMU 111,
+// Gendarmerie 1722). Source : République Togolaise (republiquetogolaise.com).
+// 👉 À COMPLÉTER : si tu connais une ligne d'écoute d'une association locale
+//    (ex. au Togo / en Afrique de l'Ouest), ajoute-la ci-dessous.
 const resources = [
   {
-    name: 'Numéro national prévention suicide',
-    number: '3114',
-    desc: 'Disponible 24h/24, 7j/7 — France',
+    name: 'SAMU — Urgences médicales',
+    number: '111',
+    desc: 'Urgence vitale, 24h/24 — Togo',
     urgent: true,
   },
   {
-    name: 'SOS Amitié',
-    number: '09 72 39 40 50',
-    desc: 'Écoute bénévole, confidentielle',
-    urgent: false,
+    name: 'Police Secours',
+    number: '117',
+    desc: 'En cas de danger immédiat — Togo',
+    urgent: true,
   },
   {
-    name: 'Croix-Rouge Écoute',
-    number: '0 800 858 858',
-    desc: 'Numéro gratuit, anonyme',
+    name: 'Gendarmerie Nationale',
+    number: '1722',
+    desc: "Assistance d'urgence — Togo",
     urgent: false,
   },
 ]
@@ -80,20 +84,26 @@ export default function CrisisOverlay({ onClose }: CrisisOverlayProps) {
             onClick={() => setExpanded(true)}
             className="w-full text-center text-xs text-[#8BA3BC] hover:text-[#F0EDE8] py-1 transition-colors"
           >
-            + Autres ressources
+            + Soins en santé mentale
           </button>
         )}
 
         {expanded && (
-          <a
-            href="https://www.psycom.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-[#E87040] hover:text-[#F09060] mt-1 transition-colors"
-          >
-            <ExternalLink size={11} />
-            psycom.org — annuaire des professionnels de santé mentale
-          </a>
+          <div className="mt-1 space-y-2">
+            <p className="text-[#8BA3BC] text-xs leading-relaxed">
+              <span className="text-[#F0EDE8] font-medium">Hôpital psychiatrique de Zébé</span> (Aného) —
+              l'établissement spécialisé de référence au Togo pour un accompagnement durable.
+            </p>
+            <a
+              href="https://www.afro.who.int/fr/countries/togo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-[#E87040] hover:text-[#F09060] transition-colors"
+            >
+              <ExternalLink size={11} />
+              OMS Togo — santé mentale
+            </a>
+          </div>
         )}
       </div>
     </div>

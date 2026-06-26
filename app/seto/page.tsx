@@ -71,10 +71,23 @@ export default function SetoHome() {
           <span className="text-[#E87040]">entre collègues.</span>
         </h1>
 
-        <p className="text-[#8BA3BC] text-lg max-w-xl mx-auto leading-relaxed mb-8">
+        <p className="text-[#8BA3BC] text-lg max-w-xl mx-auto leading-relaxed mb-6">
           Sɛto connecte chaque employé à un pair formé à l'écoute active — en toute confidentialité,
           en toute bienveillance. Parce que <em className="text-[#FAC5A8]">nous grandissons ensemble</em>.
         </p>
+
+        {/* Badges de confiance */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+          {['100 % anonyme', 'Toujours gratuit', 'Sans jugement', 'Disponible 24/7'].map((b) => (
+            <span
+              key={b}
+              className="inline-flex items-center gap-1.5 bg-[#132236] border border-[#243B55] rounded-full px-3 py-1.5 text-[#8BA3BC] text-xs"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#5BAD72]" />
+              {b}
+            </span>
+          ))}
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
